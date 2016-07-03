@@ -1,0 +1,151 @@
+完成一个级联下拉列表框（例如：省市联动）需要多少行代码呢？
+
+问过若干人，答案从100行到几万行的都有。
+
+那么对于一个二级联动下拉列表框需要这么多代码的话，那么一个四级的联动下拉列表框（比如：品牌、分类、类型、型号）又需要多少行代码？
+
+对于这个问题，我们推荐的是，每个增加一个下拉列表框只要2行。
+
+当然，这没有计算写成通用结构的代码。
+
+那么，我们来看看是什么样的代码能够通用到这种程度，可以每增加一个下拉列表框只需要2行就可以了。
+
+ 
+
+ 为了简单起见，我们采用两套级联下拉列表框来实现例子。一个是省市下拉列表框，另一个是产品下拉列表框。
+
+ 先上代码：
+复制代码
+
+ 1 <HTML encoding="UTF-8">
+ 2 <head>
+ 3 <title>Cascade Drop Down</title>
+ 4 <style type="text/css">
+ 5 .cascade_drop_down {width:200px;
+ 6 </style>
+ 7 <script type="text/javascript" src="jquery.min.js"></script>
+ 8 <script type="text/javascript">
+ 9 $(document).ready(function(){
+10     
+11     $(".cascade_drop_down").change(
+12         function () {
+13             var name = $(this).attr("name") + "_next";
+14             var next = $("#" + name).val();
+15             if (next == null || next == '') {
+16                 return;
+17             }
+18             
+19             $("#" + next).empty();
+20 
+21             $.ajax({
+22                 type:'post',
+23                 url: $(this).val() + '.txt',
+24                 data:'name=' + name + '&val=' + $(this).val(),
+25                 dataType:'text',
+26                 success:function(msg){
+27                     ops = msg.split("\n");
+28                     for (i = 0; i < ops.length; i++) {
+29                         $("#" + next).append(ops[i]);
+30                     }
+31                 },
+32                 error:function(){
+33                     alert("failed.");
+34                 }
+35             });
+36         }
+37     )
+38     
+39 });
+40 
+41 </script>
+42 </head>
+43 <body>
+44 
+45 <div>
+46 <input type="hidden" id="province_next" name="province_next" value="city">
+47 <input type="hidden" id="city_next" name="city_next" value="">
+48 
+49 <select id="province" name="province" class="cascade_drop_down">
+50     <option value="beijing">北京</option>
+51     <option value="tianjin">天津</option>
+52     <option value="shanghai">上海</option>
+53     <option value="chongqing">重庆</option>
+54     <option value="heilongjiang">黑龙江</option>
+55     <option value="jilin">吉林</option>
+56     <option value="liaoning">辽宁</option>
+57 </select>
+58 
+59 <select id="city" name="city" class="cascade_drop_down">
+60 </select>
+61 </div>
+62 
+63 <div>
+64 <input type="hidden" id="brand_next" name="brand_next" value="category">
+65 <input type="hidden" id="category_next" name="category_next" value="type">
+66 <input type="hidden" id="type_next" name="type_next" value="series">
+67 <input type="hidden" id="series_next" name="series_next" value="">
+68 
+69 <select id="brand" name="brand" class="cascade_drop_down">
+70     <option value="canon">佳能</option>
+71     <option value="sony">索尼</option>
+72     <option value="panasonic">松下</option>
+73 </select>
+74 
+75 <select id="category" name="category" class="cascade_drop_down">
+76 </select>
+77 
+78 
+79 <select id="type" name="type" class="cascade_drop_down">
+80 </select>
+81 
+82 
+83 <select id="series" name="series" class="cascade_drop_down">
+84 </select>
+85 
+86 </div>
+87 </body>
+88 
+89 </HTML>
+
+复制代码
+
+这些代码是高度复用的，我们可以根据代码规则建立数据文件，例如：beijing.txt
+复制代码
+
+ 1 <option value='1'>朝阳</option>
+ 2 <option value='2'>海淀</option>
+ 3 <option value='3'>东城</option>
+ 4 <option value='4'>西城</option>
+ 5 <option value='5'>石景山</option>
+ 6 <option value='6'>大兴</option>
+ 7 <option value='7'>丰台</option>
+ 8 <option value='8'>通州</option>
+ 9 <option value='9'>房山</option>
+10 <option value='10'>密云</option>
+11 <option value='11'>怀柔</option>
+12 <option value='12'>平谷</option>
+13 <option value='13'>昌平</option>
+14 <option value='14'>延庆</option>
+15 <option value='15'>顺义</option>
+
+复制代码
+
+好的，我们来分析一下，为什么上述代码具有高度的抽象性。
+
+1. 采用jQuery
+
+    利用class作为识别符，将级联下拉列表框选出来。
+
+    当选项发生变化的时候，调用Ajax，访问对应的数据文件(.txt)。然后，将数据文件解析后的数据加入到下一个下拉列表框，以此类推，所有的下拉列表框都可以做到级联。
+
+ 
+
+2. 数据采用txt
+
+    对于相对固定的数据可以采用txt来作为数据源，每次发布的时候都无需重新启动服务器。但是对于数据源为动态源的情况，需要访问数据库。这时候只要修改对应的ajax访问URL即可。
+
+ 
+
+结论：采用高度抽象以后，每增加一个下拉列表框只需要2行即可，1行用来声明下拉列表框，另一行用来定义下一个响应的下拉列表框ID。
+
+ 
