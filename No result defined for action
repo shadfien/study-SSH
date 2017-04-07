@@ -1,0 +1,49 @@
+No result defined for action
+在开发中总遇到这个问题，No result defined for action：
+原因：Action中的属性值为空的时候，Struts2的默认拦截器会报错，但是又找不到input的Result，不能够把错误返回，所以报这种错误。
+
+解决方法：
+1.在页面中给空值赋默认值。
+2.重新定义一个Action，去掉空值的成员变量。
+3.添加input的Result，并在这个页面给出提示
+--------------------------------------------------------------------------
+　 当你在用struts2开发时，如果，从页面跳入action时，页面报No result defined for action and result时，大部分的原因有以下几种：
+
+１、validate方法没有通过；
+
+２、页面元素中有重命名时，但后台action类的对应的接收此同名参数的是变量而没有写成数组
+
+
+ 
+要检查这种错误时，可以
+1,在后台action类中重写ActionSupport中的
+void addActionError(String anErrorMessage)
+void addActionMessage(String aMessage)
+void addFieldError(String fieldName, String errorMessage)
+这三个方法，在并在其实现代码中设置断点，监控传入的参数，并可获知页面的相关报错具体原因．
+2,在页面中加入以下标签，将错误显示出来 ：
+
+< div style =”color:red” >
+    < s:fielderror />
+</ div >
+
+--------------------------------------------------------------------------
+
+  public void addActionError(String anErrorMessage){
+   String s=anErrorMessage;
+   System.out.println(s);
+  }
+  public void addActionMessage(String aMessage){
+   String s=aMessage;
+   System.out.println(s);
+  
+  }
+  public void addFieldError(String fieldName, String errorMessage){
+   String s=errorMessage;
+   String f=fieldName;
+   System.out.println(s);
+   System.out.println(f);
+  
+  }
+来自:
+http://www.itstrike.cn/Question/9eeeed8e-8a75-4f53-bde7-d0c0a2a6f1e6
