@@ -1,0 +1,107 @@
+
+struts升级到2.5.2遇到的问题及解决方案(推荐)
+
+作者：snow365 字体：[增加 减小] 类型：转载 时间：2016-11-03 我要评论
+
+
+原来的版本是2.3.x，由于安全原因需要升级到2.5.2。但是在升级过程中遇到各种各样的问题，下面小编给大家带来了struts升级到2.5.2遇到的问题及解决方案，需要的朋友参考下吧
+
+. .
+
+
+原来的版本是2.3.x，由于安全原因需要升级到2.5.2。
+
+1，2.5.2版本不再提供xwork.jar ，整合到了 struts-core包中。
+
+2，方法不能访问的问题，需要在每个action配置文件中加上 strict-method-invocation="false"：
+
+
+
+
+
+?
+
+1
+ 
+<package name="login" namespace="/login" extends="struts-default" strict-method-invocation="false">
+ 
+
+并修改配置文件头部为2.5版本的：
+
+
+
+
+
+?
+
+1
+2
+3
+ 
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+"http://struts.apache.org/dtds/struts-2.5.dtd">
+ 
+
+3，session失效的问题，针对weblogic server，增加session-descriptor节点：
+
+
+
+
+
+?
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+ 
+<?xml version="1.0" encoding="UTF-8"?>
+<weblogic-web-app xmlns="http://www.bea.com/ns/weblogic/90">
+<context-root>/ynwjnw</context-root>
+<container-descriptor>
+<servlet-reload-check-secs>-1</servlet-reload-check-secs>
+<prefer-web-inf-classes>true</prefer-web-inf-classes>
+</container-descriptor>
+<session-descriptor>
+<cookie-name>JSESSIONID1</cookie-name>
+</session-descriptor>
+</weblogic-web-app>
+ 
+
+4，2.5.2版本jdk要求1.7 5，web.xml中把
+
+
+
+
+
+?
+
+1
+ 
+org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
+ 
+
+修改为：
+
+
+
+
+
+?
+
+1
+ 
+org.apache.struts2.dispatcher.filter.StrutsPrepareAndExecuteFilter
+ 
+
+以上所述是小编给大家介绍的struts升级到2.5.2遇到的问题及解决方案(推荐)，希望对大家有所帮助，如果大家有任何疑问请给我留言，小编会及时回复大家的。在此也非常感谢大家对脚本之家网站的支持！
+
+原文链接：http://www.cnblogs.com/snow365/p/6025316.html
